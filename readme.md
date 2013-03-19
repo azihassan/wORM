@@ -1,5 +1,4 @@
-wORM, a frugal ORM for PHP.
-'''''''''''''''''''''''''''
+####wORM, a frugal ORM for PHP.
 
 ### Intro
 

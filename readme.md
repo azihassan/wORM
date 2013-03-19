@@ -9,6 +9,8 @@ wORM is a lightweight ORM that uses PDO's faculties to provide an easy object or
 	$finder = new worm\QueryHelper($pdo, 'users');
 ```
 
+### Manual queries
+
 The QueryHelper class offers a set of methods to build SQL queries without having to write SQL code and without manually having to write prepared statements :
 
 ```php
@@ -16,7 +18,7 @@ The QueryHelper class offers a set of methods to build SQL queries without havin
 	$users = $finder	->where_op('registration_time', '>', time() - 24 * 3600 * 3)
 					->select('id', 'username')
 					->order_by('registration_time')
-					->find()
+					->find();
 
 	foreach($users as $u)
 	{
@@ -40,9 +42,9 @@ QueryHelper also provides a set of methods to manually write and execute SQL que
 ```
 
 QueryHelper::raw_select() is just an abstraction for PDO's prepare() and execute() methods.
+It returns a PDOStatement object you can iterate over :
 
 ```php
-It returns a PDOStatement object you can iterate over :
 
 	$matches = $finder->raw_select('SELECT username FROM users WHERE username LIKE ?', ['%h%']);
 	foreach($matches as $m)
@@ -50,3 +52,6 @@ It returns a PDOStatement object you can iterate over :
 		/* ... */
 	}
 ```
+
+### Models
+

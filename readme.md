@@ -10,7 +10,7 @@ wORM is a lightweight ORM that uses PDO's faculties to provide an easy object or
 ```
 
 
-The QueryHelper class offers a set of methods to build SQL queries without having to write SQL code and without manually having to write prepared statements :
+The QueryHelper class offers a set of methods to build SQL queries without having to write SQL code and without worrying about security :
 
 ```php
 	$finder = new worm\QueryHelper($pdo, 'users');
@@ -32,6 +32,14 @@ The find() method accepts an optional parameter, if set to TRUE then it will onl
 	echo $user->username;
 ```
 
+QueryHelper has a delete() method to quickly delete specific entries from the database :
+
+```php
+
+	$douchebagCount = $finder->where('comments', 'I hate this dude')->delete();
+	echo 'Removed '.$douchebagCount.' douchebags.';
+```
+
 ### Manual queries
 
 QueryHelper also provides a set of methods to manually write and execute SQL queries :
@@ -47,12 +55,65 @@ It returns a PDOStatement object you can iterate over :
 
 ```php
 
-	$matches = $finder->raw_select('SELECT username FROM users WHERE username LIKE ?', ['%h%']);
+	$matches = $finder->raw_select('SELECT username FROM users WHERE username LIKE ?', ['h%']);
 	foreach($matches as $m)
 	{
 		/* ... */
 	}
 ```
 
+QueryHelper::build_models() is the same as raw_select(), except it will return an array of Model objects :
+
+```php
+
+	$matches = $finder->build_models('SELECT username FROM users WHERE username LIKE ?', ['h%']);
+	$pdo->beginTransaction();
+	foreach($matches as $m)
+	{
+		if($m->registration_time < 3600 * 24 * 5)
+		{
+			$m->status = 'Old member';
+			$m->save();
+		}
+	}
+	$pdo->commit();
+```
+
+QueryHelper::raw_exec() is for queries that affect the database, it returns the number of affected rows :
+
+```php
+
+	$count = $finder->raw_exec('DELETE FROM users WHERE last_login > ?', [time() - 365 * 24 * 3600]);
+	echo 'Removed '.$count.' inactive users.';
+```
+
 ### Models
-... to be continued ...
+
+Model is class that represents a single row of a specific table :
+
+```php
+
+	$user = new worm\Model($pdo, 'users');
+	$user->name = $_POST['username'];
+	$user->pswd = superSecureHash($_POST['password']);
+	$user->registration_time = time();
+	try
+	{
+		$user->save();
+	}
+	catch(PDOException $e)
+	{
+		echo 'Sorry bro, something went wrong. Why don\'t you try it again later ? Hopefully it will have magically fixed itself by then cause I sure as hell won\'t fix it.';
+		log_error($e);
+	}
+```
+
+The save() method will insert a new row if no id is provided, otherwise it will perform an update :
+
+```php
+
+	$user = new worm\Model($pdo, 'users');
+	$user->id = $id;
+	$user->name = 'new_username';
+	$user->save();
+```

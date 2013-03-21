@@ -2,7 +2,7 @@
 
 ### Intro
 
-wORM is a lightweight ORM that uses PDO's faculties to provide an easy object oriented interface to the database schema. All it needs is the PDO instance and the name of the table :
+wORM is a lightweight PHP 5.3+ ORM that uses PDO's faculties to provide an easy object oriented interface to the database schema. All it needs is the PDO instance and the name of the table :
 
 ```php
 	$pdo = new PDO('mysql:host=localhost; dbname=database', 'user', 'pswd');
@@ -58,7 +58,7 @@ It returns a PDOStatement object you can iterate over :
 	$matches = $finder->raw_select('SELECT username FROM users WHERE username LIKE ?', ['h%']);
 	foreach($matches as $m)
 	{
-		/* ... */
+		/* accessing $m's entries depends on your PDO fetch mode setting */
 	}
 ```
 
@@ -66,7 +66,7 @@ QueryHelper::build_models() is the same as raw_select(), except it will return a
 
 ```php
 
-	$matches = $finder->build_models('SELECT username FROM users WHERE username LIKE ?', ['h%']);
+	$matches = $finder->build_models('SELECT username FROM users');
 	$pdo->beginTransaction();
 	foreach($matches as $m)
 	{
@@ -83,7 +83,7 @@ QueryHelper::raw_exec() is for queries that affect the database, it returns the 
 
 ```php
 
-	$count = $finder->raw_exec('DELETE FROM users WHERE last_login > ?', [time() - 365 * 24 * 3600]);
+	$count = $finder->raw_exec('DELETE FROM users WHERE last_login < ?', [time() - 365 * 24 * 3600]);
 	echo 'Removed '.$count.' inactive users.';
 ```
 
@@ -116,4 +116,11 @@ The save() method will insert a new row if no id is provided, otherwise it will 
 	$user->id = $id;
 	$user->name = 'new_username';
 	$user->save();
+
+	/* is the equivalent of */
+
+	$query = $pdo->prepare('UPDATE users SET name = ? WHERE id = ?');
+	$query->execute(['new_username', $id]);
 ```
+
+

@@ -30,7 +30,7 @@ class QueryHelper
 	public function distinct()
 	{
 		$this->distinct = true;
-		return $this;
+		return this;
 	}
 	
 	public function where($cond, $val)

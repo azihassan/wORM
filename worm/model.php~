@@ -1,7 +1,7 @@
 <?php
 namespace worm;
 
-class Model
+class Model implements 
 {
 	protected $db;
 	protected $table;

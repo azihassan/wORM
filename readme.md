@@ -28,7 +28,7 @@ The QueryHelper class offers a set of methods to build SQL queries without havin
 The find() method accepts an optional parameter, if set to TRUE then it will only retrieve one single row :
 
 ```php
-	$user = $finder->by_id(3)->find(true);
+	$user = $finder->by_pk(3)->find(true);
 	echo $user->username;
 ```
 
@@ -112,7 +112,7 @@ The save() method will insert a new row if no id is provided, otherwise it will 
 
 ```php
 
-	$user = new worm\Model($pdo, 'users');
+	$user = new worm\Model($pdo, 'users', 'id');
 	$user->id = $id;
 	$user->name = 'new_username';
 	$user->save();
@@ -123,4 +123,4 @@ The save() method will insert a new row if no id is provided, otherwise it will 
 	$query->execute(['new_username', $id]);
 ```
 
-
+... to be continued ...

@@ -6,6 +6,7 @@ class QueryHelper
 	protected $db;
 	protected $table;
 	protected $pk;
+	protected $model;
 	
 	protected $cols = array();
 	protected $distinct = false;
@@ -14,11 +15,24 @@ class QueryHelper
 	protected $group;
 	protected $limit = array();
 	
-	public function __construct(\PDO $db, $table, $pk = 'id')
+	public function __construct(\PDO $db, $table, $pk = 'id', $model = null)
 	{
 		$this->db = $db;
 		$this->table = $table;
 		$this->pk = $pk;
+		
+		if(is_null($model))
+		{
+			$possibility = ucfirst($table)
+			if(class_exists($possibility))
+			{
+				$this->model = $possibility;
+			}
+			else
+			{
+				$this->model = 'Model';
+			}
+		}
 	}
 
 	public function select()
@@ -195,7 +209,7 @@ class QueryHelper
 		$query->execute($args);
 		$objects = $query->fetchAll(
 			\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE,
-			 __NAMESPACE__.'\\Model', 
+			 __NAMESPACE__.'\\'.$this->model, 
 			 $constructor_args
 		);
 		

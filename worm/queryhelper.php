@@ -23,8 +23,8 @@ class QueryHelper
 		
 		if(is_null($model))
 		{
-			$possibility = ucfirst($table)
-			if(class_exists($possibility))
+			$possibility = ucfirst($table);
+			if(class_exists(__NAMESPACE__.'\\'.$possibility))
 			{
 				$this->model = $possibility;
 			}
